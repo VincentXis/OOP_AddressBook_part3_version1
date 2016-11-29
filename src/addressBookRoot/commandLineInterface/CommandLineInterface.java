@@ -14,11 +14,10 @@ public class CommandLineInterface {
     private AddressBookManager abm = new AddressBookManager();
 
     /**
-     * CommandLineInterface and the AutoSave function are started here.
+     * CommandLineInterface starts.
      */
     public CommandLineInterface() {
         commandLineInterface();
-        autoSave();
     }
 
     private String readUserInput() {
@@ -30,6 +29,7 @@ public class CommandLineInterface {
      */
     private void commandLineInterface() {
         log.info("CommandLineInterface started");
+        autoSave();
         String[] input;
         while (run) {
             input = readUserInput().split(" ");
