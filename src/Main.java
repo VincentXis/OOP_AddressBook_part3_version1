@@ -9,6 +9,7 @@ public class Main {
         loggerSetup();
         new AddressBookRoot();
     }
+
     private static void loggerSetup() {
         String loggingFilePath = "src/logging.properties";
         try (FileInputStream is = new FileInputStream(loggingFilePath)) {
