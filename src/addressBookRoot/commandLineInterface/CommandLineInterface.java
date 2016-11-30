@@ -10,14 +10,28 @@ public class CommandLineInterface {
     // stuff needed to keep the boat afloat
     private static final Logger log = Logger.getLogger(CommandLineInterface.class.getName());
     private boolean run = true;
-    private InputCommandHandler icHandler = new InputCommandHandler();
+    private InputCommandHandler ich = new InputCommandHandler();
     private AddressBookManager abm = new AddressBookManager();
+
+    private Thread autoSave = new Thread(() -> {
+        log.info("AutoSave Thread, started.");
+        while (run) {
+            try {
+                Thread.sleep(5_000);
+                abm.saveContactList();
+            } catch (Exception e) {
+                log.log(Level.SEVERE, "Sleep failed");
+            }
+        }
+        log.info("AutoSave Thread, ended.");
+        System.out.println("the last processes has finished running,\nready for the main process to finish.\nGood bye.");
+    });
 
     /**
      * CommandLineInterface starts.
      */
     public CommandLineInterface() {
-        commandLineInterface();
+        runCommandLineInterface();
     }
 
     private String readUserInput() {
@@ -25,13 +39,15 @@ public class CommandLineInterface {
     }
 
     /**
+     * Takes input from user and sends to readInputCommands
      * Runs while run says run.
      */
-    private void commandLineInterface() {
+    private void runCommandLineInterface() {
         log.info("CommandLineInterface started");
-        autoSave();
+        autoSave.start();
         String[] input;
         while (run) {
+            System.out.print("> ");
             input = readUserInput().split(" ");
             readInputCommands(input);
         }
@@ -40,52 +56,54 @@ public class CommandLineInterface {
     }
 
     /**
-     * Method decides where the wind blows, depending on the user input.
+     * userInput decides what actions to take. however, even if the input command is entered correctly
+     * the input parameters must be correct as well.
+     *
      * @param userInput <-- User put that in
      */
     private void readInputCommands(String[] userInput) {
         try {
             switch (userInput[0]) {
                 case "add":
-                    if (icHandler.validInputParameters(userInput)) {
-                        abm.add(userInput[1], userInput[2], userInput[3]);
+                    if (ich.validateInputParameters(userInput)) {
+                        abm.addContact(userInput[1], userInput[2], userInput[3]);
                         break;
                     }
-                    icHandler.throwInputException(userInput);
+                    ich.throwInputParameterException(userInput);
                 case "list":
-                    if (icHandler.validInputParameters(userInput)) {
-                        abm.list();
+                    if (ich.validateInputParameters(userInput)) {
+                        abm.listContacts();
                         break;
                     }
-                    icHandler.throwInputException(userInput);
+                    ich.throwInputParameterException(userInput);
                 case "search":
-                    if (icHandler.validInputParameters(userInput)) {
-                        abm.search(userInput[1]);
+                    if (ich.validateInputParameters(userInput)) {
+                        abm.searchContacts(userInput[1]);
                         break;
                     }
-                    icHandler.throwInputException(userInput);
+                    ich.throwInputParameterException(userInput);
                 case "delete":
-                    if (icHandler.validInputParameters(userInput)) {
-                        abm.delete(userInput[1]);
+                    if (ich.validateInputParameters(userInput)) {
+                        abm.deleteContact(userInput[1]);
                         break;
                     }
-                    icHandler.throwInputException(userInput);
+                    ich.throwInputParameterException(userInput);
                 case "help":
-                    if (icHandler.validInputParameters(userInput)) {
-                        icHandler.help();
+                    if (ich.validateInputParameters(userInput)) {
+                        ich.help();
                         break;
                     }
-                    icHandler.throwInputException(userInput);
+                    ich.throwInputParameterException(userInput);
                 case "quit":
-                    if (icHandler.validInputParameters(userInput)) {
-                        quit();
+                    if (ich.validateInputParameters(userInput)) {
+                        quitAddressBook();
                         break;
                     }
-                    icHandler.throwInputException(userInput);
+                    ich.throwInputParameterException(userInput);
                 default:
                     log.info("User failed to enter a valid command: " + userInput[0]);
                     System.out.println("Invalid input command: " + userInput[0] +
-                            "\nPlease try again, or type: \"help\" for a list of available commands");
+                            "\nPlease try again, or type: \"help\" for a listContacts of available commands");
                     break;
             }
         } catch (Exception e) {
@@ -96,27 +114,12 @@ public class CommandLineInterface {
     /**
      * Previously called flipSwitch, it shuts the door, turns off all the lights
      * pops a cap in AddressBooks' ass. kills it dead. Pretty much quits the application
+     *
      * @return don't run basically
      */
-    private boolean quit() {
+    private boolean quitAddressBook() {
         log.info("Program shutdown requested by user");
         System.out.println("Shutting down application, this may take a few seconds\nwaiting for active processes to finish:");
         return run = !run;
-    }
-
-    private void autoSave() {
-        new Thread(() -> {
-            log.info("AutoSave Thread, started.");
-            while (run) {
-                try {
-                    Thread.sleep(5_000);
-                    abm.saveContactList();
-                } catch (Exception e) {
-                    log.log(Level.SEVERE, "Sleep failed");
-                }
-            }
-            log.info("AutoSave Thread, ended.");
-            System.out.println("the last processes has finished running,\nready for the main process to finish.\nGood bye.");
-        }).start();
     }
 }

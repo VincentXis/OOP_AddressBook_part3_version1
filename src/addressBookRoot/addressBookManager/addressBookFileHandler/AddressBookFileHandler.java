@@ -18,11 +18,11 @@ public class AddressBookFileHandler {
             log.log(Level.SEVERE, "List could not be saved, error: ", e);
             return;
         }
-        log.info("list saved to file");
+        log.info("ContactList saved to file");
     }
 
     /**
-     * @ SuppressAnger
+     * @ Suppress THIS!
      * ┻━┻︵ \(°¤°)/ ︵ ┻━┻
      */
     @SuppressWarnings("unchecked")
@@ -31,7 +31,7 @@ public class AddressBookFileHandler {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(savedContactsFile))) {
                 return (List<Contact>) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                log.log(Level.SEVERE, "Saved contact list was unable to load from file, error: ", e);
+                log.log(Level.SEVERE, "Saved contact listContacts was unable to load from file, error: ", e);
             }
         }
         return null;

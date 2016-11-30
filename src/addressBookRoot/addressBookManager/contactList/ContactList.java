@@ -1,4 +1,4 @@
-package addressBookRoot.addressBookManager.addressBook;
+package addressBookRoot.addressBookManager.contactList;
 
 import addressBookRoot.addressBookManager.contact.Contact;
 
@@ -18,17 +18,17 @@ public class ContactList {
         this.contactList = new ArrayList<>();
     }
 
-    // get list
+    // get listContacts
     public List<Contact> getContactList() {
         return contactList;
     }
 
-    // add contact
+    // addContact contact
     public void addContactToList(Contact contact) {
         contactList.add(contact);
     }
 
-    // delete contact
+    // deleteContact contact
     public void deleteContactFromList(int indexOfContactToDelete) {
         contactList.remove(indexOfContactToDelete);
     }
