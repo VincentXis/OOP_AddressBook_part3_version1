@@ -3,6 +3,7 @@ package addressBookRoot.addressBookManager;
 import addressBookRoot.addressBookManager.addressBookFileHandler.AddressBookFileHandler;
 import addressBookRoot.addressBookManager.contact.Contact;
 import addressBookRoot.addressBookManager.contactList.ContactList;
+import addressBookRoot.externalCatalogueManager.ExternalCatalogueRequester;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,6 +15,11 @@ public class AddressBookManager {
 
     private ContactList contactList = new ContactList();
     private AddressBookFileHandler fileHandler = new AddressBookFileHandler();
+    private List<Contact> externalContacts;
+
+    public void loadExternalContacts(List<Contact> externalList){
+        externalContacts = externalList;
+    }
 
     /**
      * Constructor: calls loadContactList()
@@ -53,10 +59,10 @@ public class AddressBookManager {
      * Command: List all contacts
      */
     public void listContacts() {
-        int listSize = sortByFirstName().size();
+        int listSize = mergedSortedList().size();
         if (listSize > 0) {
             System.out.println("Listing all contacts in the Address Book:\n");
-            sortByFirstName().forEach(this::showContact);
+            mergedSortedList().forEach(this::showContact);
         }
         System.out.printf("%s %d %s\n", "There are currently:", listSize, "saved contact/s in your Address Book\n");
 
@@ -69,7 +75,7 @@ public class AddressBookManager {
     public void searchContacts(String query) {
         log.info("User requested to searchContacts contacts in listContacts.");
         System.out.printf("%s %s\n%s\n\n", "Searching for contact with names starting with:", query, "All matches if any will be shown below:");
-        sortByFirstName().stream().filter(contact ->
+        mergedSortedList().stream().filter(contact ->
                 contact.getFirstName().toLowerCase().startsWith(query) || contact.getLastName().toLowerCase().startsWith(query)
         ).forEach(this::showContact);
     }
@@ -110,6 +116,7 @@ public class AddressBookManager {
         System.out.format("Contact UUID: %s\n  First name: %s\n   Last name: %s\n\t  E-mail: %s\n\n",
                 contact.getUuid().toString(), contact.getFirstName(), contact.getLastName(), contact.getEmail()
         );
+//        System.out.format("%s,%s,%s,%s\n", contact.getUuid().toString(), contact.getFirstName(), contact.getLastName(), contact.getEmail());
     }
 
     /**
@@ -117,9 +124,11 @@ public class AddressBookManager {
      *
      * @return - sorted sorted listContacts
      */
-    private List<Contact> sortByFirstName() {
+    private List<Contact> mergedSortedList() {
         List<Contact> sortedContactList = new ArrayList<>(contactList.getContactList());
-        sortedContactList.sort(Comparator.comparing(contact -> contact.getFirstName(), String.CASE_INSENSITIVE_ORDER));
+        sortedContactList.addAll(externalContacts);
+
+        sortedContactList.sort(Comparator.comparing(Contact::getFirstName, String.CASE_INSENSITIVE_ORDER));
         return sortedContactList;
     }
 }

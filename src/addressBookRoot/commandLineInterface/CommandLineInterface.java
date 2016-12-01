@@ -1,6 +1,7 @@
 package addressBookRoot.commandLineInterface;
 
 import addressBookRoot.addressBookManager.AddressBookManager;
+import addressBookRoot.externalCatalogueManager.ExternalCatalogueRequester;
 
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -12,6 +13,12 @@ public class CommandLineInterface {
     private boolean run = true;
     private InputCommandHandler ich = new InputCommandHandler();
     private AddressBookManager abm = new AddressBookManager();
+    private ExternalCatalogueRequester ecr = new ExternalCatalogueRequester();
+
+    private Thread requestContactsFromServer = new Thread(() -> {
+        ecr.requestDataFromExternalCatalogue();
+        abm.loadExternalContacts(ecr.getExternalContactList());
+    });
 
     private Thread autoSave = new Thread(() -> {
         log.info("AutoSave Thread, started.");
@@ -44,6 +51,7 @@ public class CommandLineInterface {
      */
     private void runCommandLineInterface() {
         log.info("CommandLineInterface started");
+        requestContactsFromServer.start();
         autoSave.start();
         String[] input;
         while (run) {
