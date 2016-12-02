@@ -126,7 +126,11 @@ public class AddressBookManager {
      */
     private List<Contact> mergedSortedList() {
         List<Contact> sortedContactList = new ArrayList<>(contactList.getContactList());
-        sortedContactList.addAll(externalContacts);
+        try {
+            sortedContactList.addAll(externalContacts);
+        } catch (Exception e){
+
+        }
 
         sortedContactList.sort(Comparator.comparing(Contact::getFirstName, String.CASE_INSENSITIVE_ORDER));
         return sortedContactList;

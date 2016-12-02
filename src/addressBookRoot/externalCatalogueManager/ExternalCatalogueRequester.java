@@ -22,11 +22,11 @@ public class ExternalCatalogueRequester {
     }
 
     // Request Data from external catalogue
-    public void requestDataFromExternalCatalogue(int port) {
+    public void requestDataFromExternalCatalogue(String ipAddress, int port) {
         String inputLine;
         String[] inputLineSplit;
         this.contactListFromServer = new ArrayList<>();
-        try (Socket socket = new Socket("localhost", port);
+        try (Socket socket = new Socket(ipAddress, port);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
         ) {
@@ -45,6 +45,7 @@ public class ExternalCatalogueRequester {
         }
         System.out.println(contactListFromServer.size());
     }
+
     public void requestDataFromExternalCatalogue() {
         String inputLine;
         String[] inputLineSplit;
@@ -55,13 +56,12 @@ public class ExternalCatalogueRequester {
         ) {
             out.println("get all");
             while ((inputLine = in.readLine()) != null) {
-//                if (inputLine.isEmpty()) {
-//                }
-                if (inputLine.length() < 1) {
+                if (inputLine.isEmpty()) {
                     break;
                 }
                 inputLineSplit = inputLine.split(" ");
                 this.contactListFromServer.add(new Contact(inputLineSplit[0], inputLineSplit[1], inputLineSplit[2], inputLineSplit[3]));
+
             }
             out.println("exit");
         } catch (IOException e) {
