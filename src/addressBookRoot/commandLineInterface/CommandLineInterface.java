@@ -2,10 +2,7 @@ package addressBookRoot.commandLineInterface;
 
 import addressBookRoot.addressBookManager.AddressBookManager;
 import addressBookRoot.externalCatalogueManager.ExternalCatalogueManager;
-import addressBookRoot.externalCatalogueManager.ExternalCatalogueRequester;
 
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +15,12 @@ public class CommandLineInterface {
     private AddressBookManager abm = new AddressBookManager();
     private ExternalCatalogueManager ecm = new ExternalCatalogueManager();
 
-
+    /**
+     * enter enter a valid ip-address, and port-number.
+     * "localhost", 6117    will be
+     * "localhost", 1618        initial ports
+     * "localhost", 61619           on server project side
+     */
     private void requestContactsFromServer() {
         new Thread(() -> {
 //        ecm.getDataFromExternalSource("localhost", 61616);

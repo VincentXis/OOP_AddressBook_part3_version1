@@ -3,7 +3,6 @@ package addressBookRoot.addressBookManager;
 import addressBookRoot.addressBookManager.addressBookFileHandler.AddressBookFileHandler;
 import addressBookRoot.addressBookManager.contact.Contact;
 import addressBookRoot.addressBookManager.contactList.ContactList;
-import addressBookRoot.externalCatalogueManager.ExternalCatalogueRequester;
 
 import java.util.ArrayList;
 import java.util.Comparator;
