@@ -2,16 +2,14 @@ package addressBookRoot.externalCatalogueManager;
 
 import addressBookRoot.addressBookManager.contact.Contact;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SocketHandler;
 
 public class ExternalCatalogueRequester {
     private static final Logger log = Logger.getLogger(ExternalCatalogueRequester.class.getName());
@@ -29,17 +27,16 @@ public class ExternalCatalogueRequester {
 
         try (Socket socket = new Socket("localhost", 61616);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             Scanner in = new Scanner(new BufferedReader(new InputStreamReader(socket.getInputStream())))
+             InputStream is = socket.getInputStream();
+             InputStreamReader isr = new InputStreamReader(is);
+             Scanner read = new Scanner(isr)
+//             BufferedReader read = new BufferedReader(in)
         ) {
             out.println("get all");
-
-            while ((inputLine = in.nextLine()) != null) {
-//                if (!in.nextLine().equals(false)) {
-//                    break;
-//                }
-//                if (inputLine.isEmpty()) {
-//                    break;
-//                }
+            while ((inputLine = read.nextLine()) != null) {
+                if (inputLine.isEmpty()) {
+                    break;
+                }
                 inputLineSplit = inputLine.split(" ");
                 this.contactListFromServer.add(new Contact(inputLineSplit[0], inputLineSplit[1], inputLineSplit[2], inputLineSplit[3]));
             }
@@ -50,6 +47,4 @@ public class ExternalCatalogueRequester {
         }
         System.out.println(contactListFromServer.size());
     }
-
-
 }
