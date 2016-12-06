@@ -1,6 +1,7 @@
 package addressBookRoot.commandLineInterface;
 
 import addressBookRoot.addressBookManager.AddressBookManager;
+import addressBookRoot.externalCatalogueManager.ExternalCatalogueManager;
 import addressBookRoot.externalCatalogueManager.ExternalCatalogueRequester;
 
 import java.util.Scanner;
@@ -14,10 +15,13 @@ public class CommandLineInterface {
     private InputCommandHandler ich = new InputCommandHandler();
     private AddressBookManager abm = new AddressBookManager();
     private ExternalCatalogueRequester ecr = new ExternalCatalogueRequester();
+    private ExternalCatalogueManager ecm = new ExternalCatalogueManager();
 
     private Thread requestContactsFromServer = new Thread(() -> {
-        ecr.requestDataFromExternalCatalogue();
-        abm.loadExternalContacts(ecr.getExternalContactList());
+        ecm.manageDataFromExternalSource();
+//        ecr.requestDataFromExternalCatalogue();
+//        abm.loadExternalContacts(ecr.getExternalContactList());
+//        System.out.println(ecr.getExternalContactList().size() + " contacts have been loaded from an external catalogue");
     });
 
     private Thread autoSave = new Thread(() -> {

@@ -27,13 +27,10 @@ public class ExternalCatalogueRequester {
 
         try (Socket socket = new Socket("localhost", 61616);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             InputStream is = socket.getInputStream();
-             InputStreamReader isr = new InputStreamReader(is);
-             Scanner read = new Scanner(isr)
-//             BufferedReader read = new BufferedReader(in)
+             Scanner in = new Scanner(new InputStreamReader(socket.getInputStream()))
         ) {
             out.println("get all");
-            while ((inputLine = read.nextLine()) != null) {
+            while ((inputLine = in.nextLine()) != null) {
                 if (inputLine.isEmpty()) {
                     break;
                 }
@@ -45,6 +42,27 @@ public class ExternalCatalogueRequester {
             log.log(Level.SEVERE, "Connection refused, Server unavailable: ", e);
             System.out.println("Could not load external contacts, Server unavailable");
         }
-        System.out.println(contactListFromServer.size());
+    }
+
+    public List<String> requestCatalogueFromExternalSource(String ipAddress, int portNumber) {
+        List<String> dataFromExternalSource = new ArrayList<>();
+        String inputLine;
+        try (Socket socket = new Socket(ipAddress, portNumber);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             Scanner in = new Scanner(new InputStreamReader(socket.getInputStream()))
+        ) {
+            out.println("get all");
+            while ((inputLine = in.nextLine()) != null) {
+                if (inputLine.isEmpty()) {
+                    break;
+                }
+                dataFromExternalSource.add(inputLine);
+            }
+            out.println("exit");
+        } catch (IOException e) {
+            log.log(Level.SEVERE, "Connection refused, Server unavailable: ", e);
+            System.out.println("Could not load external contacts, Server unavailable");
+        }
+        return dataFromExternalSource;
     }
 }
