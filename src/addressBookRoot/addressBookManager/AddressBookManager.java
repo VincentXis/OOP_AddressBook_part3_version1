@@ -8,6 +8,7 @@ import addressBookRoot.externalCatalogueManager.ExternalCatalogueRequester;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AddressBookManager {
@@ -17,24 +18,15 @@ public class AddressBookManager {
     private AddressBookFileHandler fileHandler = new AddressBookFileHandler();
     private List<Contact> externalContacts;
 
-    public void loadExternalContacts(List<Contact> externalList){
+    public void loadExternalCatalogueContacts(List<Contact> externalList) {
         externalContacts = externalList;
     }
 
-    /**
-     * Constructor: calls loadContactList()
-     * I have a question here, is it better to leave code outside of a constructor?
-     * or should i have written all the code from the "loadContactList" method here?
-     */
     public AddressBookManager() {
         loadContactList();
     }
 
-    /**
-     * Method requests a saved Contact List from file:
-     * if return is: null, a new ArrayList is created through ContactLists constructor.
-     * else the saved Contact List is Loaded
-     */
+
     private void loadContactList() {
         if (fileHandler.loadListFromDisk() != null) {
             contactList = new ContactList(fileHandler.loadListFromDisk());
@@ -45,48 +37,30 @@ public class AddressBookManager {
         }
     }
 
-    /**
-     * Command: Add Contact to listContacts
-     */
     public void addContact(String firstName, String lastName, String eMail) {
         contactList.addContactToList(new Contact(firstName, lastName, eMail));
         System.out.printf("New contact: %s %s, was added to your Address Book\n", firstName, lastName);
-
         log.info("User added new contact to listContacts");
     }
 
-    /**
-     * Command: List all contacts
-     */
     public void listContacts() {
-        int listSize = mergedSortedList().size();
-        if (listSize > 0) {
+        if (mergedSortedList().size() > 0) {
             System.out.println("Listing all contacts in the Address Book:\n");
             mergedSortedList().forEach(this::showContact);
         }
-        System.out.printf("%s %d %s\n", "There are currently:", listSize, "saved contact/s in your Address Book\n");
-
+        System.out.printf("Number of contacts available\nExternal:\t%d\nLocal:\t\t%d\n",
+                externalContacts.size(), contactList.getContactList().size());
         log.info("User requested to see all contacts in listContacts.");
     }
 
-    /**
-     * Command: Search Contact/s in listContacts
-     */
     public void searchContacts(String query) {
         log.info("User requested to searchContacts contacts in listContacts.");
         System.out.printf("%s %s\n%s\n\n", "Searching for contact with names starting with:", query, "All matches if any will be shown below:");
-        mergedSortedList().stream().filter(contact ->
-                contact.getFirstName().toLowerCase().startsWith(query) || contact.getLastName().toLowerCase().startsWith(query)
-        ).forEach(this::showContact);
+        mergedSortedList().stream()
+                .filter(contact -> contact.getFirstName().toLowerCase().startsWith(query) || contact.getLastName().toLowerCase().startsWith(query))
+                .forEach(this::showContact);
     }
 
-    /**
-     * Command: Delete Contact from listContacts
-     * Cycles through contact listContacts and finds the index of the contact matching the input
-     * conditional Feedback
-     * match: found match + info, logs contact deleted
-     * no match: found no match, logs user tried to deleteContact but found no match
-     */
     public void deleteContact(String idStringToMatch) {
         for (int i = 0; i < contactList.getContactList().size(); i++) {
             if (contactList.getContactList().get(i).getUuid().toString().equals(idStringToMatch)) {
@@ -102,36 +76,25 @@ public class AddressBookManager {
         log.info("User tried to deleteContact a contact from the listContacts, no contact matched provided id string.");
     }
 
-    /**
-     * Saves ContactList to file
-     */
     public void saveContactList() {
         fileHandler.saveListToDisk(new ArrayList<>(contactList.getContactList()));
     }
 
-    /**
-     * Shows formatted Contact information, used in listContacts and searchContacts
-     */
     private void showContact(Contact contact) {
         System.out.format("Contact UUID: %s\n  First name: %s\n   Last name: %s\n\t  E-mail: %s\n\n",
                 contact.getUuid().toString(), contact.getFirstName(), contact.getLastName(), contact.getEmail()
         );
-//        System.out.format("%s,%s,%s,%s\n", contact.getUuid().toString(), contact.getFirstName(), contact.getLastName(), contact.getEmail());
     }
 
-    /**
-     * Takes a copy of contactList, sorts it and returns it for use in searchContacts and listContacts
-     *
-     * @return - sorted sorted listContacts
-     */
     private List<Contact> mergedSortedList() {
         List<Contact> sortedContactList = new ArrayList<>(contactList.getContactList());
         try {
-            sortedContactList.addAll(externalContacts);
-        } catch (Exception e){
-
+            if (!externalContacts.isEmpty()) {
+                sortedContactList.addAll(externalContacts);
+            } else throw new Exception("External Catalogue is not available to merge, no data contacts in list.");
+        } catch (Exception e) {
+            log.log(Level.WARNING, "An error occurred when trying to merge lists", e);
         }
-
         sortedContactList.sort(Comparator.comparing(Contact::getFirstName, String.CASE_INSENSITIVE_ORDER));
         return sortedContactList;
     }

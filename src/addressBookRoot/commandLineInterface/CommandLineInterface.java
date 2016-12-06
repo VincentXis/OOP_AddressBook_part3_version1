@@ -4,25 +4,35 @@ import addressBookRoot.addressBookManager.AddressBookManager;
 import addressBookRoot.externalCatalogueManager.ExternalCatalogueManager;
 import addressBookRoot.externalCatalogueManager.ExternalCatalogueRequester;
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CommandLineInterface {
-    // stuff needed to keep the boat afloat
+
     private static final Logger log = Logger.getLogger(CommandLineInterface.class.getName());
     private boolean run = true;
     private InputCommandHandler ich = new InputCommandHandler();
     private AddressBookManager abm = new AddressBookManager();
-    private ExternalCatalogueRequester ecr = new ExternalCatalogueRequester();
     private ExternalCatalogueManager ecm = new ExternalCatalogueManager();
 
-    private Thread requestContactsFromServer = new Thread(() -> {
-//        ecm.manageDataFromExternalSource();
-        ecr.requestDataFromExternalCatalogue();
-        abm.loadExternalContacts(ecr.getExternalContactList());
-//        System.out.println(ecr.getExternalContactList().size() + " contacts have been loaded from an external catalogue");
-    });
+
+    private void requestContactsFromServer() {
+        new Thread(() -> {
+//        ecm.getDataFromExternalSource("localhost", 61616);
+            //                   Enter your target ip address, and the port-number here
+            ecm.getDataFromExternalSource("localhost", 6117);
+            ecm.getDataFromExternalSource("localhost", 1618);
+            ecm.getDataFromExternalSource("localhost", 61619);
+            // create contacts from received data
+            ecm.createContactsFromExternalData();
+            // load external contacts into AddressBookManager from ExternalCatalogueManager
+            abm.loadExternalCatalogueContacts(ecm.getContactsFromExternalCatalogue());
+            System.out.println(ecm.getContactsFromExternalCatalogue().size() + " contacts have been loaded from an external catalogue");
+        }).start();
+    }
 
     private Thread autoSave = new Thread(() -> {
         log.info("AutoSave Thread, started.");
@@ -38,9 +48,6 @@ public class CommandLineInterface {
         System.out.println("the last processes has finished running,\nready for the main process to finish.\nGood bye.");
     });
 
-    /**
-     * CommandLineInterface starts.
-     */
     public CommandLineInterface() {
         runCommandLineInterface();
     }
@@ -49,31 +56,23 @@ public class CommandLineInterface {
         return new Scanner(System.in).nextLine();
     }
 
-    /**
-     * Takes input from user and sends to readInputCommands
-     * Runs while run says run.
-     */
     private void runCommandLineInterface() {
         log.info("CommandLineInterface started");
-        requestContactsFromServer.start();
+        requestContactsFromServer();
         autoSave.start();
-        String[] input;
+        String input;
         while (run) {
             System.out.print("> ");
-            input = readUserInput().split(" ");
+            input = readUserInput();
             readInputCommands(input);
         }
         abm.saveContactList();
         log.info("CommandLineInterface finished");
     }
 
-    /**
-     * userInput decides what actions to take. however, even if the input command is entered correctly
-     * the input parameters must be correct as well.
-     *
-     * @param userInput <-- User put that in
-     */
-    private void readInputCommands(String[] userInput) {
+    private void readInputCommands(String userInputString) {
+        log.info("User input equals: " + userInputString);
+        String[] userInput = userInputString.split(" ");
         try {
             switch (userInput[0]) {
                 case "add":
@@ -123,12 +122,6 @@ public class CommandLineInterface {
         }
     }
 
-    /**
-     * Previously called flipSwitch, it shuts the door, turns off all the lights
-     * pops a cap in AddressBooks' ass. kills it dead. Pretty much quits the application
-     *
-     * @return don't run basically
-     */
     private boolean quitAddressBook() {
         log.info("Program shutdown requested by user");
         System.out.println("Shutting down application, this may take a few seconds\nwaiting for active processes to finish:");
