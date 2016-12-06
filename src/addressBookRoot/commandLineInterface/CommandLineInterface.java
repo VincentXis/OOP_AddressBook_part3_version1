@@ -18,9 +18,9 @@ public class CommandLineInterface {
     private ExternalCatalogueManager ecm = new ExternalCatalogueManager();
 
     private Thread requestContactsFromServer = new Thread(() -> {
-        ecm.manageDataFromExternalSource();
-//        ecr.requestDataFromExternalCatalogue();
-//        abm.loadExternalContacts(ecr.getExternalContactList());
+//        ecm.manageDataFromExternalSource();
+        ecr.requestDataFromExternalCatalogue();
+        abm.loadExternalContacts(ecr.getExternalContactList());
 //        System.out.println(ecr.getExternalContactList().size() + " contacts have been loaded from an external catalogue");
     });
 

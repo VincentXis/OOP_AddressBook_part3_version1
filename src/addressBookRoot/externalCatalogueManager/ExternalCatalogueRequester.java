@@ -31,7 +31,7 @@ public class ExternalCatalogueRequester {
         ) {
             out.println("get all");
             while ((inputLine = in.nextLine()) != null) {
-                if (inputLine.isEmpty()) {
+                if (inputLine.equals("")) {
                     break;
                 }
                 inputLineSplit = inputLine.split(" ");
@@ -65,4 +65,5 @@ public class ExternalCatalogueRequester {
         }
         return dataFromExternalSource;
     }
+
 }
