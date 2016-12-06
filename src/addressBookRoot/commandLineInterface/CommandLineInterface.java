@@ -114,8 +114,8 @@ public class CommandLineInterface {
                     }
                     ich.throwInputParameterException(userInput);
                 default:
-                    log.info("User failed to enter a valid command: " + userInput[0]);
-                    System.out.println("Invalid input command: " + userInput[0] +
+                    log.info("User failed to enter a valid command: " + userInputString);
+                    System.out.println("Invalid input command: " + userInputString +
                             "\nPlease try again, or type: \"help\" for a listContacts of available commands");
                     break;
             }
