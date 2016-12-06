@@ -17,6 +17,7 @@ public class CommandLineInterface {
 
     private Thread requestContactsFromServer = new Thread(() -> {
         ecr.requestDataFromExternalCatalogue();
+
         abm.loadExternalContacts(ecr.getExternalContactList());
     });
 
