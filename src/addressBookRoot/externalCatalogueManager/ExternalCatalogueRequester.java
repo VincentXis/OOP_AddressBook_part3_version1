@@ -33,8 +33,8 @@ public class ExternalCatalogueRequester {
             }
             out.println("exit");
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Connection refused, Server unavailable: ", e);
-            System.out.format("Could not load external contacts from Server: %s %d\n", ipAddress, portNumber);
+            log.log(Level.SEVERE, String.format("Connection refused, Server unavailable: %s %d", ipAddress, portNumber), e);
+            System.out.format("Connection failed, Server unavailable: %s %d\n", ipAddress, portNumber);
         }
         return dataFromExternalSource;
     }

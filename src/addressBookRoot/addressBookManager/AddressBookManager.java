@@ -70,7 +70,7 @@ public class AddressBookManager {
                 return;
             }
         }
-        System.out.println("No contact matched the provided UUID in your Address Book: No contact was deleted.");
+        System.out.println("No contact matched the provided UUID in your local Address Book: No contact was deleted.");
 
         log.info("User tried to deleteContact a contact from the listContacts, no contact matched provided id string.");
     }
