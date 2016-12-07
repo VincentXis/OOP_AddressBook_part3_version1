@@ -20,7 +20,7 @@ public class ExternalCatalogueRequester {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              Scanner in = new Scanner(new InputStreamReader(socket.getInputStream()))
         ) {
-            out.println("get all");
+            out.println("getall");
             while ((inputLine = in.nextLine()) != null) {
                 if (inputLine.isEmpty()) {
                     break;
