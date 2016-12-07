@@ -21,20 +21,21 @@ public class CommandLineInterface {
      * "localhost", 1618        initial ports
      * "localhost", 61619           on server project side
      */
-    private void requestContactsFromServer() {
-        new Thread(() -> {
-//        ecm.getDataFromExternalSource("localhost", 61616);
-            //                   Enter your target ip address, and the port-number here
-            ecm.getDataFromExternalSource("localhost", 6117);
-            ecm.getDataFromExternalSource("localhost", 1618);
-            ecm.getDataFromExternalSource("localhost", 61619);
-            // create contacts from received data
-            ecm.createContactsFromExternalData();
-            // load external contacts into AddressBookManager from ExternalCatalogueManager
-            abm.loadExternalCatalogueContacts(ecm.getContactsFromExternalCatalogue());
-            System.out.println(ecm.getContactsFromExternalCatalogue().size() + " contacts have been loaded from an external catalogue");
-        }).start();
-    }
+    private Thread requestContactsFromServer = new Thread(() -> {
+        ecm.getDataFromExternalSource("localhost", 61616);
+
+//        Enter your target ip address, and the port-number here
+// -------------------------------------------------------------
+//        ecm.getDataFromExternalSource("localhost", 6117);
+//        ecm.getDataFromExternalSource("localhost", 1618);
+//        ecm.getDataFromExternalSource("localhost", 61619);
+// -------------------------------------------------------------
+        ecm.createContactsFromExternalCatalogueStrings();
+
+        abm.loadExternalCatalogueContacts(ecm.getContactsFromExternalCatalogue());
+        System.out.println(ecm.getContactsFromExternalCatalogue().size() + " contacts have been loaded from an external catalogue");
+    });
+
 
     private Thread autoSave = new Thread(() -> {
         log.info("AutoSave Thread, started.");
@@ -60,7 +61,7 @@ public class CommandLineInterface {
 
     private void runCommandLineInterface() {
         log.info("CommandLineInterface started");
-        requestContactsFromServer();
+        requestContactsFromServer.start();
         autoSave.start();
         String input;
         while (run) {

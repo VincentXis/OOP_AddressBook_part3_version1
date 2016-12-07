@@ -21,15 +21,14 @@ public class ExternalCatalogueManager extends ExternalCatalogueRequester {
     public void getDataFromExternalSource(String ipAddress, int portNumber) {
         this.stringDataFromExternalSource.addAll(super.requestCatalogueFromExternalSource(ipAddress, portNumber));
         if (!stringDataFromExternalSource.isEmpty()) {
-            log.info("Data was successfully returned from external source in string form, and added to: stringDataFromExternalSource" +
-                    "\nserver IP-Address: " + ipAddress + "Port-number: " + portNumber);
+            log.info("Data was successfully returned from external source server IP-Address: " + ipAddress + "Port-number: " + portNumber);
         } else {
             log.log(Level.SEVERE, "No data was returned from given source" +
                     "\nserver IP-Address: " + ipAddress + "Port-number: " + portNumber);
         }
     }
 
-    public void createContactsFromExternalData() {
+    public void createContactsFromExternalCatalogueStrings() {
         String[] splitString;
         int failCount = 0;
         for (String data : stringDataFromExternalSource) {
@@ -46,14 +45,18 @@ public class ExternalCatalogueManager extends ExternalCatalogueRequester {
     }
 
     private boolean validateContactCompatibility(String[] stringArrayToValidate) {
-        for (String aStringArrayToValidate : stringArrayToValidate) {
-            if (aStringArrayToValidate.isEmpty() || stringArrayToValidate.length != 4)  // Step one/two
+        for (String stringToValidate : stringArrayToValidate) {
+            if (stringToValidate.isEmpty() || stringArrayToValidate.length != 4) { // Step one/two
+                log.log(Level.WARNING, "incompatible string for contact creation, failed validation. String length: "
+                        + stringToValidate.length() + " Array length: " + stringArrayToValidate.length);
                 return false;
+            }
         }
         try {
             UUID idChecker = UUID.fromString(stringArrayToValidate[0]); // Step three
         } catch (IllegalArgumentException e) {
-            log.log(Level.SEVERE, "Error occurred while preforming the UUID.fromString check: ", e);
+            log.log(Level.SEVERE, "Contact failed validation, error occurred while preforming the UUID.fromString check, string: "
+                    + stringArrayToValidate[0] + " is not compatible for contact creation", e);
             return false;
         }
         return true; // input is valid for contact creation
